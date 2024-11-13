@@ -12,7 +12,7 @@ namespace UnitySensors.ROS.Publisher.Sensor
 
         private void Awake()
         {
-            _serializer.SetSource(_source as IPointCloudInterface<PointXYZI>);
+            serializer.SetSource(_source as IPointCloudInterface<PointXYZI>);
         }
     }
 }

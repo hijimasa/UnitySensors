@@ -46,5 +46,10 @@ namespace UnitySensors.ROS.Serializer.Tf2
             _msg.transforms = transforms.ToArray();
             return _msg;
         }
+
+        public override void SetFrameId(string frame_id)
+        {
+            _header.frame_id = frame_id;
+        }
     }
 }

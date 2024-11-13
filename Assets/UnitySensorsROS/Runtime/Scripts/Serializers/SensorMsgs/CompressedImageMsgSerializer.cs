@@ -43,5 +43,32 @@ namespace UnitySensors.ROS.Serializer.Sensor
             _msg.data = (_sourceTexture == SourceTexture.Texture0 ? _sourceInterface.texture0 : _sourceInterface.texture1).EncodeToJPG(quality);
             return _msg;
         }
+
+        public override void SetObject(UnityEngine.Object obj)
+        {
+            if (_source == null)
+            {
+                _source = new Object();
+            }
+            _source = obj;
+        }
+
+        public override void SetHeaderObject(UnityEngine.Object obj)
+        {
+            if (_header == null)
+            {
+                _header = new HeaderSerializer();
+            }
+            if (_header.source == null)
+            {
+                _header.source = new Object();
+            }
+            _header.source = obj;
+        }
+
+        public override void SetFrameId(string frame_id)
+        {
+            _header.frame_id = frame_id;
+        }
     }
 }

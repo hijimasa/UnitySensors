@@ -33,5 +33,10 @@ namespace UnitySensors.ROS.Serializer.Sensor
             _msg.angular_velocity = _sourceInterface.angularVelocity.To<FLU>();
             return _msg;
         }
+
+        public override void SetFrameId(string frame_id)
+        {
+            _header.frame_id = frame_id;
+        }
     }
 }

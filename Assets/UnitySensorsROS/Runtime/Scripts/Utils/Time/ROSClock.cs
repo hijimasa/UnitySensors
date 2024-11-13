@@ -8,8 +8,7 @@ namespace UnitySensors.ROS.Utils.Time
 {
     public class ROSClock : MonoBehaviour
     {
-        [SerializeField]
-        private string _topicName = "clock";
+        public string topicName = "clock";
 
         private ROSConnection _ros;
         private ClockMsg _message;
@@ -18,7 +17,7 @@ namespace UnitySensors.ROS.Utils.Time
         {
             this._ros = ROSConnection.GetOrCreateInstance();
 
-            this._ros.RegisterPublisher<ClockMsg>(this._topicName);
+            this._ros.RegisterPublisher<ClockMsg>(this.topicName);
 
             this._message = new ClockMsg();
             this._message.clock.sec = 0;
@@ -37,7 +36,7 @@ namespace UnitySensors.ROS.Utils.Time
             _message.clock.sec = sec;
             _message.clock.nanosec = nanosec;
 
-            _ros.Publish(this._topicName, this._message);
+            _ros.Publish(this.topicName, this._message);
         }
     }
 }

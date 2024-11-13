@@ -78,5 +78,10 @@ namespace UnitySensors.ROS.Serializer.PointCloud
             _jobHandle.Complete();
             if (_data.IsCreated) _data.Dispose();
         }
+
+        public override void SetFrameId(string frame_id)
+        {
+            _header.frame_id = frame_id;
+        }
     }
 }

@@ -10,21 +10,21 @@ namespace UnitySensors.ROS.Serializer.Std
     [System.Serializable]
     public class HeaderSerializer : RosMsgSerializer<HeaderMsg>
     {
-        [SerializeField, Interface(typeof(ITimeInterface))]
-        private UnityEngine.Object _source;
-        [SerializeField]
-        private string _frame_id;
+        [Interface(typeof(ITimeInterface))]
+        public UnityEngine.Object source;
+
+        public string frame_id;
 
         private ITimeInterface _sourceInterface;
 
         public override void Init()
         {
             base.Init();
-            _sourceInterface = _source as ITimeInterface;
+            _sourceInterface = source as ITimeInterface;
 
             _msg = new HeaderMsg();
 
-            _msg.frame_id = _frame_id;
+            _msg.frame_id = frame_id;
 #if ROS2
 #else
             _msg.seq = 0;

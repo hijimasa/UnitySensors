@@ -33,5 +33,10 @@ namespace UnitySensors.ROS.Serializer.Geometry
             _msg.pose.orientation = _sourceInterface.rotation.To<FLU>();
             return _msg;
         }
+
+        public override void SetFrameId(string frame_id)
+        {
+            _header.frame_id = frame_id;
+        }
     }
 }

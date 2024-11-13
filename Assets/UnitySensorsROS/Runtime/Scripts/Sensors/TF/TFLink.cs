@@ -16,8 +16,7 @@ namespace UnitySensors.Sensor.TF
 
     public class TFLink : UnitySensor
     {
-        [SerializeField]
-        private string _frame_id;
+        public string frame_id;
         [SerializeField]
         private TFLink[] _children;
 
@@ -41,7 +40,7 @@ namespace UnitySensors.Sensor.TF
 
             foreach (TFLink child in _children)
             {
-                tfData.AddRange(child.GetTFData(_frame_id, worldToLocalMatrix, worldToLocalQuaternion));
+                tfData.AddRange(child.GetTFData(frame_id, worldToLocalMatrix, worldToLocalQuaternion));
             }
 
             return tfData.ToArray();
@@ -53,7 +52,7 @@ namespace UnitySensors.Sensor.TF
 
             TFData tfData_self;
             tfData_self.frame_id_parent = frame_id_parent;
-            tfData_self.frame_id_child = _frame_id;
+            tfData_self.frame_id_child = frame_id;
             tfData_self.position = (Vector3)(worldToLocalMatrix * new Vector4(_transform.position.x, _transform.position.y, _transform.position.z, 1.0f));
             Vector3 localScale = _transform.localScale;
             Vector3 lossyScale = _transform.lossyScale;
@@ -72,7 +71,7 @@ namespace UnitySensors.Sensor.TF
 
             foreach (TFLink child in _children)
             {
-                tfData.AddRange(child.GetTFData(_frame_id, worldToLocalMatrix, worldToLocalQuaternion));
+                tfData.AddRange(child.GetTFData(frame_id, worldToLocalMatrix, worldToLocalQuaternion));
             }
 
             return tfData.ToArray();

@@ -8,14 +8,11 @@ namespace UnitySensors.ROS.Publisher
 {
     public class RosMsgPublisher<T, TT> : MonoBehaviour where T : RosMsgSerializer<TT> where TT : Message, new()
     {
-        [SerializeField]
-        private float _frequency = 10.0f;
+        public float frequency = 10.0f;
 
-        [SerializeField]
-        protected string _topicName;
+        public string topicName;
 
-        [SerializeField]
-        protected T _serializer;
+        public T serializer;
 
         private ROSConnection _ros;
 
@@ -27,12 +24,12 @@ namespace UnitySensors.ROS.Publisher
         protected virtual void Start()
         {
             _dt = 0.0f;
-            _frequency_inv = 1.0f / _frequency;
+            _frequency_inv = 1.0f / frequency;
 
             _ros = ROSConnection.GetOrCreateInstance();
-            _ros.RegisterPublisher<TT>(_topicName);
+            _ros.RegisterPublisher<TT>(topicName);
 
-            _serializer.Init();
+            serializer.Init();
         }
 
         protected virtual void Update()
@@ -40,14 +37,14 @@ namespace UnitySensors.ROS.Publisher
             _dt += Time.deltaTime;
             if (_dt < _frequency_inv) return;
 
-            _ros.Publish(_topicName, _serializer.Serialize());
+            _ros.Publish(topicName, serializer.Serialize());
 
             _dt -= _frequency_inv;
         }
 
         private void OnDestroy()
         {
-            _serializer.OnDestroy();
+            serializer.OnDestroy();
         }
     }
 }

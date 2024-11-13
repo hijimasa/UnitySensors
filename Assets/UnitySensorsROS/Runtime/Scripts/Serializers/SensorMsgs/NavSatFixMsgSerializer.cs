@@ -58,5 +58,10 @@ namespace UnitySensors.ROS.Serializer.Sensor
             _msg.position_covariance_type = 0;
             return _msg;
         }
+
+        public override void SetFrameId(string frame_id)
+        {
+            _header.frame_id = frame_id;
+        }
     }
 }

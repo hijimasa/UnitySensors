@@ -111,11 +111,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _source: {fileID: 6928715047789551323}
-  _frequency: 10
-  _topicName: /camera/info
+  frequency: 10
+  topicName: /camera/info
   _serializer:
     _header:
-      _frame_id: /camera_frame
+      frame_id: /camera_frame
 --- !u!114 &2224187045829796718
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -129,11 +129,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _source: {fileID: 6928715047789551323}
-  _frequency: 10
-  _topicName: /camera/depth/points
+  frequency: 10
+  topicName: /camera/depth/points
   _serializer:
     _header:
-      _frame_id: /camera_frame
+      frame_id: /camera_frame
 --- !u!114 &6110166055807567966
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -147,12 +147,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _source: {fileID: 6928715047789551323}
-  _frequency: 10
-  _topicName: /camera/depth/image/compressed
+  frequency: 10
+  topicName: /camera/depth/image/compressed
   _serializer:
     _sourceTexture: 0
     _header:
-      _frame_id: /camera_frame
+      frame_id: /camera_frame
     quality: 75
 --- !u!114 &8736958369943202624
 MonoBehaviour:
@@ -167,10 +167,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _source: {fileID: 6928715047789551323}
-  _frequency: 10
-  _topicName: /camera/color/image/compressed
+  frequency: 10
+  topicName: /camera/color/image/compressed
   _serializer:
     _sourceTexture: 1
     _header:
-      _frame_id: /camera_frame
+      frame_id: /camera_frame
     quality: 75

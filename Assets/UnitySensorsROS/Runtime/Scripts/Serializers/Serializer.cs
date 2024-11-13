@@ -12,5 +12,9 @@ namespace UnitySensors.ROS.Serializer
         public virtual void Init() { _msg = new T(); }
         public abstract T Serialize();
         public virtual void OnDestroy() { }
+        
+        public virtual void SetObject(UnityEngine.Object obj) { }
+        public virtual void SetHeaderObject(UnityEngine.Object obj) { }
+        public virtual void SetFrameId(string frame_id) { }
     }
 }
