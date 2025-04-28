@@ -2,9 +2,9 @@ var annotated_dup =
 [
     [ "UnitySensors", "namespaceUnitySensors.html", [
       [ "Attribute", "namespaceUnitySensors_1_1Attribute.html", [
-        [ "InterfaceTypeDrawer", "classUnitySensors_1_1Attribute_1_1InterfaceTypeDrawer.html", "classUnitySensors_1_1Attribute_1_1InterfaceTypeDrawer" ],
         [ "Interface", "classUnitySensors_1_1Attribute_1_1Interface.html", null ],
         [ "InterfaceAttribute", "classUnitySensors_1_1Attribute_1_1InterfaceAttribute.html", "classUnitySensors_1_1Attribute_1_1InterfaceAttribute" ],
+        [ "InterfaceTypeDrawer", "classUnitySensors_1_1Attribute_1_1InterfaceTypeDrawer.html", "classUnitySensors_1_1Attribute_1_1InterfaceTypeDrawer" ],
         [ "ReadOnlyAttribute", "classUnitySensors_1_1Attribute_1_1ReadOnlyAttribute.html", null ]
       ] ],
       [ "DataType", "namespaceUnitySensors_1_1DataType.html", [
@@ -16,6 +16,11 @@ var annotated_dup =
           [ "ScanPattern", "classUnitySensors_1_1DataType_1_1LiDAR_1_1ScanPattern.html", "classUnitySensors_1_1DataType_1_1LiDAR_1_1ScanPattern" ]
         ] ],
         [ "Sensor", "namespaceUnitySensors_1_1DataType_1_1Sensor.html", [
+          [ "PointCloud", "namespaceUnitySensors_1_1DataType_1_1Sensor_1_1PointCloud.html", [
+            [ "PointXYZ", "structUnitySensors_1_1DataType_1_1Sensor_1_1PointCloud_1_1PointXYZ.html", "structUnitySensors_1_1DataType_1_1Sensor_1_1PointCloud_1_1PointXYZ" ],
+            [ "PointXYZI", "structUnitySensors_1_1DataType_1_1Sensor_1_1PointCloud_1_1PointXYZI.html", "structUnitySensors_1_1DataType_1_1Sensor_1_1PointCloud_1_1PointXYZI" ],
+            [ "PointXYZRGB", "structUnitySensors_1_1DataType_1_1Sensor_1_1PointCloud_1_1PointXYZRGB.html", "structUnitySensors_1_1DataType_1_1Sensor_1_1PointCloud_1_1PointXYZRGB" ]
+          ] ],
           [ "PointCloud", "classUnitySensors_1_1DataType_1_1Sensor_1_1PointCloud.html", "classUnitySensors_1_1DataType_1_1Sensor_1_1PointCloud" ]
         ] ]
       ] ],
@@ -53,12 +58,13 @@ var annotated_dup =
           ] ],
           [ "Sensor", "namespaceUnitySensors_1_1ROS_1_1Publisher_1_1Sensor.html", [
             [ "CompressedImageMsgPublisher", "classUnitySensors_1_1ROS_1_1Publisher_1_1Sensor_1_1CompressedImageMsgPublisher.html", null ],
-            [ "IMUMsgPublisher", "classUnitySensors_1_1ROS_1_1Publisher_1_1Sensor_1_1IMUMsgPublisher.html", null ],
-            [ "NavSatFixMsgPublisher", "classUnitySensors_1_1ROS_1_1Publisher_1_1Sensor_1_1NavSatFixMsgPublisher.html", null ],
             [ "DepthCameraPointCloud2MsgPublisher", "classUnitySensors_1_1ROS_1_1Publisher_1_1Sensor_1_1DepthCameraPointCloud2MsgPublisher.html", "classUnitySensors_1_1ROS_1_1Publisher_1_1Sensor_1_1DepthCameraPointCloud2MsgPublisher" ],
+            [ "ImageMsgPublisher", "classUnitySensors_1_1ROS_1_1Publisher_1_1Sensor_1_1ImageMsgPublisher.html", null ],
+            [ "IMUMsgPublisher", "classUnitySensors_1_1ROS_1_1Publisher_1_1Sensor_1_1IMUMsgPublisher.html", null ],
             [ "LiDARPointCloud2MsgPublisher", "classUnitySensors_1_1ROS_1_1Publisher_1_1Sensor_1_1LiDARPointCloud2MsgPublisher.html", "classUnitySensors_1_1ROS_1_1Publisher_1_1Sensor_1_1LiDARPointCloud2MsgPublisher" ],
-            [ "RGBDCameraPointCloud2MsgPublisher", "classUnitySensors_1_1ROS_1_1Publisher_1_1Sensor_1_1RGBDCameraPointCloud2MsgPublisher.html", "classUnitySensors_1_1ROS_1_1Publisher_1_1Sensor_1_1RGBDCameraPointCloud2MsgPublisher" ],
-            [ "PointCloud2MsgPublisher", "classUnitySensors_1_1ROS_1_1Publisher_1_1Sensor_1_1PointCloud2MsgPublisher.html", null ]
+            [ "NavSatFixMsgPublisher", "classUnitySensors_1_1ROS_1_1Publisher_1_1Sensor_1_1NavSatFixMsgPublisher.html", null ],
+            [ "PointCloud2MsgPublisher", "classUnitySensors_1_1ROS_1_1Publisher_1_1Sensor_1_1PointCloud2MsgPublisher.html", null ],
+            [ "RGBDCameraPointCloud2MsgPublisher", "classUnitySensors_1_1ROS_1_1Publisher_1_1Sensor_1_1RGBDCameraPointCloud2MsgPublisher.html", "classUnitySensors_1_1ROS_1_1Publisher_1_1Sensor_1_1RGBDCameraPointCloud2MsgPublisher" ]
           ] ],
           [ "Tf2", "namespaceUnitySensors_1_1ROS_1_1Publisher_1_1Tf2.html", [
             [ "TFMessageMsgPublisher", "classUnitySensors_1_1ROS_1_1Publisher_1_1Tf2_1_1TFMessageMsgPublisher.html", null ]
@@ -69,6 +75,12 @@ var annotated_dup =
           [ "Geometry", "namespaceUnitySensors_1_1ROS_1_1Serializer_1_1Geometry.html", [
             [ "PoseStampedMsgSerializer", "classUnitySensors_1_1ROS_1_1Serializer_1_1Geometry_1_1PoseStampedMsgSerializer.html", "classUnitySensors_1_1ROS_1_1Serializer_1_1Geometry_1_1PoseStampedMsgSerializer" ]
           ] ],
+          [ "Image", "namespaceUnitySensors_1_1ROS_1_1Serializer_1_1Image.html", [
+            [ "Color16UC1", "structUnitySensors_1_1ROS_1_1Serializer_1_1Image_1_1Color16UC1.html", "structUnitySensors_1_1ROS_1_1Serializer_1_1Image_1_1Color16UC1" ],
+            [ "Color32FC1", "structUnitySensors_1_1ROS_1_1Serializer_1_1Image_1_1Color32FC1.html", "structUnitySensors_1_1ROS_1_1Serializer_1_1Image_1_1Color32FC1" ],
+            [ "ColorRGB8", "structUnitySensors_1_1ROS_1_1Serializer_1_1Image_1_1ColorRGB8.html", "structUnitySensors_1_1ROS_1_1Serializer_1_1Image_1_1ColorRGB8" ],
+            [ "ImageEncodeJob", "structUnitySensors_1_1ROS_1_1Serializer_1_1Image_1_1ImageEncodeJob.html", "structUnitySensors_1_1ROS_1_1Serializer_1_1Image_1_1ImageEncodeJob" ]
+          ] ],
           [ "PointCloud", "namespaceUnitySensors_1_1ROS_1_1Serializer_1_1PointCloud.html", [
             [ "IInvertXJob", "structUnitySensors_1_1ROS_1_1Serializer_1_1PointCloud_1_1IInvertXJob.html", "structUnitySensors_1_1ROS_1_1Serializer_1_1PointCloud_1_1IInvertXJob" ],
             [ "PointCloud2MsgSerializer", "classUnitySensors_1_1ROS_1_1Serializer_1_1PointCloud_1_1PointCloud2MsgSerializer.html", "classUnitySensors_1_1ROS_1_1Serializer_1_1PointCloud_1_1PointCloud2MsgSerializer" ]
@@ -76,6 +88,7 @@ var annotated_dup =
           [ "Sensor", "namespaceUnitySensors_1_1ROS_1_1Serializer_1_1Sensor.html", [
             [ "CameraInfoMsgSerializer", "classUnitySensors_1_1ROS_1_1Serializer_1_1Sensor_1_1CameraInfoMsgSerializer.html", "classUnitySensors_1_1ROS_1_1Serializer_1_1Sensor_1_1CameraInfoMsgSerializer" ],
             [ "CompressedImageMsgSerializer", "classUnitySensors_1_1ROS_1_1Serializer_1_1Sensor_1_1CompressedImageMsgSerializer.html", "classUnitySensors_1_1ROS_1_1Serializer_1_1Sensor_1_1CompressedImageMsgSerializer" ],
+            [ "ImageMsgSerializer", "classUnitySensors_1_1ROS_1_1Serializer_1_1Sensor_1_1ImageMsgSerializer.html", "classUnitySensors_1_1ROS_1_1Serializer_1_1Sensor_1_1ImageMsgSerializer" ],
             [ "IMUMsgSerializer", "classUnitySensors_1_1ROS_1_1Serializer_1_1Sensor_1_1IMUMsgSerializer.html", "classUnitySensors_1_1ROS_1_1Serializer_1_1Sensor_1_1IMUMsgSerializer" ],
             [ "NavSatFixMsgSerializer", "classUnitySensors_1_1ROS_1_1Serializer_1_1Sensor_1_1NavSatFixMsgSerializer.html", "classUnitySensors_1_1ROS_1_1Serializer_1_1Sensor_1_1NavSatFixMsgSerializer" ]
           ] ],
@@ -100,9 +113,9 @@ var annotated_dup =
         [ "Camera", "namespaceUnitySensors_1_1Sensor_1_1Camera.html", [
           [ "CameraSensor", "classUnitySensors_1_1Sensor_1_1Camera_1_1CameraSensor.html", "classUnitySensors_1_1Sensor_1_1Camera_1_1CameraSensor" ],
           [ "DepthCameraSensor", "classUnitySensors_1_1Sensor_1_1Camera_1_1DepthCameraSensor.html", "classUnitySensors_1_1Sensor_1_1Camera_1_1DepthCameraSensor" ],
+          [ "ITextureToColorPointsJob", "structUnitySensors_1_1Sensor_1_1Camera_1_1ITextureToColorPointsJob.html", "structUnitySensors_1_1Sensor_1_1Camera_1_1ITextureToColorPointsJob" ],
           [ "ITextureToPointsJob", "structUnitySensors_1_1Sensor_1_1Camera_1_1ITextureToPointsJob.html", "structUnitySensors_1_1Sensor_1_1Camera_1_1ITextureToPointsJob" ],
           [ "RGBCameraSensor", "classUnitySensors_1_1Sensor_1_1Camera_1_1RGBCameraSensor.html", "classUnitySensors_1_1Sensor_1_1Camera_1_1RGBCameraSensor" ],
-          [ "ITextureToColorPointsJob", "structUnitySensors_1_1Sensor_1_1Camera_1_1ITextureToColorPointsJob.html", "structUnitySensors_1_1Sensor_1_1Camera_1_1ITextureToColorPointsJob" ],
           [ "RGBDCameraSensor", "classUnitySensors_1_1Sensor_1_1Camera_1_1RGBDCameraSensor.html", "classUnitySensors_1_1Sensor_1_1Camera_1_1RGBDCameraSensor" ]
         ] ],
         [ "GNSS", "namespaceUnitySensors_1_1Sensor_1_1GNSS.html", [
@@ -117,10 +130,10 @@ var annotated_dup =
         ] ],
         [ "LiDAR", "namespaceUnitySensors_1_1Sensor_1_1LiDAR.html", [
           [ "DepthBufferLiDARSensor", "classUnitySensors_1_1Sensor_1_1LiDAR_1_1DepthBufferLiDARSensor.html", "classUnitySensors_1_1Sensor_1_1LiDAR_1_1DepthBufferLiDARSensor" ],
-          [ "ITextureToPointsJob", "structUnitySensors_1_1Sensor_1_1LiDAR_1_1ITextureToPointsJob.html", "structUnitySensors_1_1Sensor_1_1LiDAR_1_1ITextureToPointsJob" ],
-          [ "LiDARSensor", "classUnitySensors_1_1Sensor_1_1LiDAR_1_1LiDARSensor.html", "classUnitySensors_1_1Sensor_1_1LiDAR_1_1LiDARSensor" ],
           [ "IRaycastHitsToPointsJob", "structUnitySensors_1_1Sensor_1_1LiDAR_1_1IRaycastHitsToPointsJob.html", "structUnitySensors_1_1Sensor_1_1LiDAR_1_1IRaycastHitsToPointsJob" ],
+          [ "ITextureToPointsJob", "structUnitySensors_1_1Sensor_1_1LiDAR_1_1ITextureToPointsJob.html", "structUnitySensors_1_1Sensor_1_1LiDAR_1_1ITextureToPointsJob" ],
           [ "IUpdateRaycastCommandsJob", "structUnitySensors_1_1Sensor_1_1LiDAR_1_1IUpdateRaycastCommandsJob.html", "structUnitySensors_1_1Sensor_1_1LiDAR_1_1IUpdateRaycastCommandsJob" ],
+          [ "LiDARSensor", "classUnitySensors_1_1Sensor_1_1LiDAR_1_1LiDARSensor.html", "classUnitySensors_1_1Sensor_1_1LiDAR_1_1LiDARSensor" ],
           [ "RaycastLiDARSensor", "classUnitySensors_1_1Sensor_1_1LiDAR_1_1RaycastLiDARSensor.html", "classUnitySensors_1_1Sensor_1_1LiDAR_1_1RaycastLiDARSensor" ]
         ] ],
         [ "TF", "namespaceUnitySensors_1_1Sensor_1_1TF.html", [
@@ -141,15 +154,15 @@ var annotated_dup =
           [ "IUpdateGaussianNoisesJob", "structUnitySensors_1_1Utils_1_1Noise_1_1IUpdateGaussianNoisesJob.html", "structUnitySensors_1_1Utils_1_1Noise_1_1IUpdateGaussianNoisesJob" ]
         ] ],
         [ "PointCloud", "namespaceUnitySensors_1_1Utils_1_1PointCloud.html", [
-          [ "PointUtilities", "classUnitySensors_1_1Utils_1_1PointCloud_1_1PointUtilities.html", "classUnitySensors_1_1Utils_1_1PointCloud_1_1PointUtilities" ]
+          [ "PointUtilitiesSO", "classUnitySensors_1_1Utils_1_1PointCloud_1_1PointUtilitiesSO.html", "classUnitySensors_1_1Utils_1_1PointCloud_1_1PointUtilitiesSO" ]
         ] ]
       ] ],
       [ "Visualization", "namespaceUnitySensors_1_1Visualization.html", [
         [ "Sensor", "namespaceUnitySensors_1_1Visualization_1_1Sensor.html", [
           [ "DepthCameraPointCloudVisualizer", "classUnitySensors_1_1Visualization_1_1Sensor_1_1DepthCameraPointCloudVisualizer.html", "classUnitySensors_1_1Visualization_1_1Sensor_1_1DepthCameraPointCloudVisualizer" ],
           [ "LiDARPointCloudVisualizer", "classUnitySensors_1_1Visualization_1_1Sensor_1_1LiDARPointCloudVisualizer.html", "classUnitySensors_1_1Visualization_1_1Sensor_1_1LiDARPointCloudVisualizer" ],
-          [ "RGBDCameraPointCloudVisualizer", "classUnitySensors_1_1Visualization_1_1Sensor_1_1RGBDCameraPointCloudVisualizer.html", "classUnitySensors_1_1Visualization_1_1Sensor_1_1RGBDCameraPointCloudVisualizer" ],
           [ "PointCloudVisualizer", "classUnitySensors_1_1Visualization_1_1Sensor_1_1PointCloudVisualizer.html", "classUnitySensors_1_1Visualization_1_1Sensor_1_1PointCloudVisualizer" ],
+          [ "RGBDCameraPointCloudVisualizer", "classUnitySensors_1_1Visualization_1_1Sensor_1_1RGBDCameraPointCloudVisualizer.html", "classUnitySensors_1_1Visualization_1_1Sensor_1_1RGBDCameraPointCloudVisualizer" ],
           [ "TextureVisualizer", "classUnitySensors_1_1Visualization_1_1Sensor_1_1TextureVisualizer.html", "classUnitySensors_1_1Visualization_1_1Sensor_1_1TextureVisualizer" ]
         ] ],
         [ "Visualizer", "classUnitySensors_1_1Visualization_1_1Visualizer.html", "classUnitySensors_1_1Visualization_1_1Visualizer" ]
