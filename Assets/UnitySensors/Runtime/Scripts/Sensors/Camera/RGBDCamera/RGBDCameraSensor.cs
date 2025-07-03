@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Rendering;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
@@ -55,7 +56,13 @@ namespace UnitySensors.Sensor.Camera
         protected override void Init()
         {
             base.Init();
-            _depthRt = new RenderTexture(_resolution.x, _resolution.y, 0, RenderTextureFormat.ARGBFloat);
+#if UNITY_6000_0_OR_NEWER
+            var depthDescriptor = new RenderTextureDescriptor(_resolution.x, _resolution.y, RenderTextureFormat.ARGBFloat, 24);
+            depthDescriptor.depthStencilFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.D24_UNorm_S8_UInt;
+            _depthRt = new RenderTexture(depthDescriptor);
+#else
+            _depthRt = new RenderTexture(_resolution.x, _resolution.y, 24, RenderTextureFormat.ARGBFloat);
+#endif
             _depthCamera.targetTexture = _depthRt;
 
             GameObject colorCameraObject = new GameObject();
@@ -65,7 +72,13 @@ namespace UnitySensors.Sensor.Camera
             colorCameraTransform.localRotation = Quaternion.identity;
 
             _colorCamera = colorCameraObject.AddComponent<UnityEngine.Camera>();
-            _colorRt = new RenderTexture(_resolution.x, _resolution.y, 0, RenderTextureFormat.ARGB32);
+#if UNITY_6000_0_OR_NEWER
+            var colorDescriptor = new RenderTextureDescriptor(_resolution.x, _resolution.y, RenderTextureFormat.ARGB32, 24);
+            colorDescriptor.depthStencilFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.D24_UNorm_S8_UInt;
+            _colorRt = new RenderTexture(colorDescriptor);
+#else
+            _colorRt = new RenderTexture(_resolution.x, _resolution.y, 24, RenderTextureFormat.ARGB32);
+#endif
             _colorCamera.targetTexture = _colorRt;
 
             _depthCamera.fieldOfView = _colorCamera.fieldOfView = _fov;

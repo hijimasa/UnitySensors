@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Rendering;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
@@ -49,7 +50,13 @@ namespace UnitySensors.Sensor.Camera
             _camera.nearClipPlane = _minRange;
             _camera.farClipPlane = _maxRange;
 
-            _rt = new RenderTexture(_resolution.x, _resolution.y, 0, RenderTextureFormat.ARGBFloat);
+#if UNITY_6000_0_OR_NEWER
+            var descriptor = new RenderTextureDescriptor(_resolution.x, _resolution.y, RenderTextureFormat.ARGBFloat, 24);
+            descriptor.depthStencilFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.D24_UNorm_S8_UInt;
+            _rt = new RenderTexture(descriptor);
+#else
+            _rt = new RenderTexture(_resolution.x, _resolution.y, 24, RenderTextureFormat.ARGBFloat);
+#endif
             _camera.targetTexture = _rt;
 
             _texture = new Texture2D(_resolution.x, _resolution.y, TextureFormat.RGBAFloat, false);
