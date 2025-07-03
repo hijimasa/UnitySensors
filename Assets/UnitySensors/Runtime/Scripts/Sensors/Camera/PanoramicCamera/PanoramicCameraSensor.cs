@@ -13,16 +13,45 @@ namespace UnitySensors.Sensor.Camera
         protected override void Init()
         {
             base.Init();
-            _cubemap = new RenderTexture(_cubemapResolution.x, _cubemapResolution.y, 0, RenderTextureFormat.ARGB32)
+#if UNITY_6000_0_OR_NEWER
+            var cubemapDescriptor = new RenderTextureDescriptor(_cubemapResolution.x, _cubemapResolution.y, RenderTextureFormat.ARGB32, 24)
             {
                 dimension = TextureDimension.Cube
             };
-            _rt = new RenderTexture(_resolution.x, _resolution.y, 0, RenderTextureFormat.ARGB32);
+            cubemapDescriptor.depthStencilFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.D24_UNorm_S8_UInt;
+            _cubemap = new RenderTexture(cubemapDescriptor);
+            
+            var rtDescriptor = new RenderTextureDescriptor(_resolution.x, _resolution.y, RenderTextureFormat.ARGB32, 24);
+            rtDescriptor.depthStencilFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.D24_UNorm_S8_UInt;
+            _rt = new RenderTexture(rtDescriptor);
+#else
+            _cubemap = new RenderTexture(_cubemapResolution.x, _cubemapResolution.y, 24, RenderTextureFormat.ARGB32)
+            {
+                dimension = TextureDimension.Cube
+            };
+            _rt = new RenderTexture(_resolution.x, _resolution.y, 24, RenderTextureFormat.ARGB32);
+#endif
             _texture = new Texture2D(_resolution.x, _resolution.y, TextureFormat.RGBA32, false);
+            
+            // Create material from shader if not assigned
+            if (_panoramicMat == null)
+            {
+                var shader = Shader.Find("UnitySensors/Panoramic");
+                if (shader != null)
+                {
+                    _panoramicMat = new Material(shader);
+                }
+                else
+                {
+                    Debug.LogError("PanoramicCamera shader not found. Please assign _panoramicMat manually.");
+                }
+            }
         }
 
         protected override void UpdateSensor()
         {
+            if (_panoramicMat == null) return;
+            
             _panoramicMat.SetVector("_Rotation", transform.rotation.eulerAngles);
             m_camera.RenderToCubemap(_cubemap);
             Graphics.Blit(_cubemap, _rt, _panoramicMat);

@@ -30,16 +30,45 @@ namespace UnitySensors.Sensor.Camera
         protected override void Init()
         {
             base.Init();
-            _cubemap = new RenderTexture(_cubemapResolution, _cubemapResolution, 0, RenderTextureFormat.ARGB32)
+#if UNITY_6000_0_OR_NEWER
+            var cubemapDescriptor = new RenderTextureDescriptor(_cubemapResolution, _cubemapResolution, RenderTextureFormat.ARGB32, 24)
             {
                 dimension = TextureDimension.Cube
             };
-            _rt = new RenderTexture(_resolution.x, _resolution.y, 0, RenderTextureFormat.ARGB32);
+            cubemapDescriptor.depthStencilFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.D24_UNorm_S8_UInt;
+            _cubemap = new RenderTexture(cubemapDescriptor);
+            
+            var rtDescriptor = new RenderTextureDescriptor(_resolution.x, _resolution.y, RenderTextureFormat.ARGB32, 24);
+            rtDescriptor.depthStencilFormat = UnityEngine.Experimental.Rendering.GraphicsFormat.D24_UNorm_S8_UInt;
+            _rt = new RenderTexture(rtDescriptor);
+#else
+            _cubemap = new RenderTexture(_cubemapResolution, _cubemapResolution, 24, RenderTextureFormat.ARGB32)
+            {
+                dimension = TextureDimension.Cube
+            };
+            _rt = new RenderTexture(_resolution.x, _resolution.y, 24, RenderTextureFormat.ARGB32);
+#endif
             _texture = new Texture2D(_resolution.x, _resolution.y, TextureFormat.RGBA32, false);
+            
+            // Create material from shader if not assigned
+            if (_fisheyeMat == null)
+            {
+                var shader = Shader.Find("UnitySensors/FisheyeCamera");
+                if (shader != null)
+                {
+                    _fisheyeMat = new Material(shader);
+                }
+                else
+                {
+                    Debug.LogError("FisheyeCamera shader not found. Please assign _fisheyeMat manually.");
+                }
+            }
         }
 
         protected override void UpdateSensor()
         {
+            if (_fisheyeMat == null) return;
+            
             m_camera.RenderToCubemap(_cubemap);
 
             _fisheyeMat.SetInteger("_Equidistant", _cameraModel == CameraModel.Equidistant ? 1 : 0);
