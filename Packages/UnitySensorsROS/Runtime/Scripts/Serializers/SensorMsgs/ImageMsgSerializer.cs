@@ -35,6 +35,17 @@ namespace UnitySensors.ROS.Serializer.Sensor
         private ITextureInterface _sourceInterface;
         private ImageEncodeJob _imageEncodeJob;
 
+        /// <summary>
+        /// Configure serializer at runtime (avoids Reflection overhead)
+        /// </summary>
+        public void Configure(ITextureInterface source, HeaderSerializer header, int sourceTextureIndex, int encodingValue)
+        {
+            _source = source as Object;
+            _sourceInterface = source;
+            _header = header;
+            _sourceTexture = (SourceTexture)sourceTextureIndex;
+            _encoding = (Encoding)encodingValue;
+        }
 
         public override void Init()
         {

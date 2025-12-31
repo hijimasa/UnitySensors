@@ -29,6 +29,17 @@ namespace UnitySensors.ROS.Serializer.Sensor
 
         private ITextureInterface _sourceInterface;
 
+        /// <summary>
+        /// Configure serializer at runtime (avoids Reflection overhead)
+        /// </summary>
+        public void Configure(ITextureInterface source, HeaderSerializer header, int sourceTextureIndex)
+        {
+            _source = source as Object;
+            _sourceInterface = source;
+            _header = header;
+            _sourceTexture = (SourceTexture)sourceTextureIndex;
+        }
+
         public override void Init()
         {
             base.Init();

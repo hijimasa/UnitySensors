@@ -29,6 +29,14 @@ namespace UnitySensors.ROS.Serializer.PointCloud
             _sourceInterface = sourceInterface;
         }
 
+        /// <summary>
+        /// Configure serializer with header at runtime (avoids Reflection overhead)
+        /// </summary>
+        public void Configure(HeaderSerializer header)
+        {
+            _header = header;
+        }
+
         public override void Init()
         {
             base.Init();
@@ -60,10 +68,14 @@ namespace UnitySensors.ROS.Serializer.PointCloud
         {
             _msg.header = _header.Serialize();
 
+            // Copy source data to native array for processing
             _sourceInterface.pointCloud.points.Reinterpret<byte>(PointUtilitiesSO.pointDataSizes[typeof(T)]).CopyTo(_data);
-            _jobHandle = _invertXJob.Schedule(_pointsNum, 1024);
+
+            // Schedule job with larger batch size for better performance
+            _jobHandle = _invertXJob.Schedule(_pointsNum, 2048);
             _jobHandle.Complete();
 
+            // Use NativeArray.CopyTo with managed array - this is optimized internally
             _data.CopyTo(_msg.data);
 
             return _msg;

@@ -17,6 +17,16 @@ namespace UnitySensors.ROS.Serializer.Std
 
         private ITimeInterface _sourceInterface;
 
+        /// <summary>
+        /// Configure header serializer at runtime (avoids Reflection overhead)
+        /// </summary>
+        public void Configure(ITimeInterface source, string frameId)
+        {
+            _source = source as UnityEngine.Object;
+            _sourceInterface = source;
+            _frame_id = frameId;
+        }
+
         public override void Init()
         {
             base.Init();

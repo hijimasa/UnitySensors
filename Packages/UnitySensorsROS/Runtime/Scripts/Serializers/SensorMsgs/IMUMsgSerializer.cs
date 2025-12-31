@@ -18,6 +18,16 @@ namespace UnitySensors.ROS.Serializer.Sensor
 
         private IImuDataInterface _sourceInterface;
 
+        /// <summary>
+        /// Configure serializer at runtime (avoids Reflection overhead)
+        /// </summary>
+        public void Configure(IImuDataInterface source, HeaderSerializer header)
+        {
+            _source = source as Object;
+            _sourceInterface = source;
+            _header = header;
+        }
+
         public override void Init()
         {
             base.Init();

@@ -35,6 +35,18 @@ namespace UnitySensors.ROS.Serializer.Sensor
             _sourceInterface = sourceInterface;
         }
 
+        /// <summary>
+        /// Configure serializer parameters at runtime (avoids Reflection overhead)
+        /// </summary>
+        public void Configure(HeaderSerializer header, ScanPattern pattern, float minRng, float maxRng, float noiseSigma)
+        {
+            _header = header;
+            _scanPattern = pattern;
+            _minRange = minRng;
+            _maxRange = maxRng;
+            _gaussianNoiseSigma = noiseSigma;
+        }
+
         public override void Init()
         {
             base.Init();
