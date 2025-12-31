@@ -25,6 +25,7 @@ namespace UnitySensors.ROS.Publisher
         private int _publisher_id;
 
         public string topicName { get => _topicName; set => _topicName = value; }
+        public T serializer { get => _serializer; set => _serializer = value; }
         public float frequency
         {
             get => _frequency;
