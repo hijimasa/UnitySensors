@@ -33,6 +33,18 @@ namespace UnitySensors.Sensor.LiDAR
         public PointCloud<PointXYZI> pointCloud { get => _pointCloud; }
         public int pointsNum { get => _pointsNumPerScan; }
 
+        /// <summary>
+        /// Configure LiDAR sensor parameters at runtime (avoids Reflection overhead)
+        /// </summary>
+        public void Configure(ScanPattern pattern, float minRng, float maxRng, float noiseSigma, int pointsPerScan)
+        {
+            _scanPattern = pattern;
+            _minRange = minRng;
+            _maxRange = maxRng;
+            _gaussianNoiseSigma = noiseSigma;
+            _pointsNumPerScan = pointsPerScan;
+        }
+
         protected override void Init()
         {
             if (_scanPattern == null)

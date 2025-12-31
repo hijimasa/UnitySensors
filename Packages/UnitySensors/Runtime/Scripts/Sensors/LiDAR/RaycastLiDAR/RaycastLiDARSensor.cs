@@ -102,17 +102,18 @@ namespace UnitySensors.Sensor.LiDAR
             _updateRaycastCommandsJob.origin = _transform.position;
             _updateRaycastCommandsJob.localToWorldMatrix = _transform.localToWorldMatrix;
 
-            JobHandle updateRaycastCommandsJobHandle = _updateRaycastCommandsJob.Schedule(pointsNum, 1024);
-            JobHandle updateGaussianNoisesJobHandle = _updateGaussianNoisesJob.Schedule(pointsNum, 1, updateRaycastCommandsJobHandle);
-            JobHandle raycastJobHandle = RaycastCommand.ScheduleBatch(_raycastCommands, _raycastHits, 1024, updateGaussianNoisesJobHandle);
-            _jobHandle = _raycastHitsToPointsJob.Schedule(pointsNum, 1024, raycastJobHandle);
+            // Use larger batch sizes for better job efficiency
+            JobHandle updateRaycastCommandsJobHandle = _updateRaycastCommandsJob.Schedule(pointsNum, 2048);
+            JobHandle updateGaussianNoisesJobHandle = _updateGaussianNoisesJob.Schedule(pointsNum, 2048, updateRaycastCommandsJobHandle);
+            JobHandle raycastJobHandle = RaycastCommand.ScheduleBatch(_raycastCommands, _raycastHits, 2048, updateGaussianNoisesJobHandle);
+            _jobHandle = _raycastHitsToPointsJob.Schedule(pointsNum, 2048, raycastJobHandle);
 
-            // yield return new WaitUntil(() => _jobHandle.IsCompleted);
-            _jobHandle.Complete();
+            // Yield until job is completed instead of blocking (allows other work to continue)
+            yield return new WaitUntil(() => _jobHandle.IsCompleted);
+            _jobHandle.Complete(); // Final sync to ensure completion
 
             _updateRaycastCommandsJob.indexOffset = (_updateRaycastCommandsJob.indexOffset + pointsNum) % scanPattern.size;
             _raycastHitsToPointsJob.indexOffset = (_raycastHitsToPointsJob.indexOffset + pointsNum) % scanPattern.size;
-            yield return null;
         }
 
         protected override void OnSensorDestroy()

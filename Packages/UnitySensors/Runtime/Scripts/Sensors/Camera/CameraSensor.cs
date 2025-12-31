@@ -25,6 +25,15 @@ namespace UnitySensors.Sensor.Camera
 
         public float texture0FarClipPlane { get => _camera.farClipPlane; }
 
+        /// <summary>
+        /// Configure camera sensor parameters at runtime (avoids Reflection overhead)
+        /// </summary>
+        public void Configure(Vector2Int resolution, float fov)
+        {
+            _resolution = resolution;
+            _fov = fov;
+        }
+
         protected override void Init()
         {
             _camera = GetComponent<UnityEngine.Camera>();
