@@ -32,7 +32,7 @@ namespace UnitySensors.Sensor.Camera
         private Material _depthCameraMat;
         [SerializeField]
         private bool _convertToPointCloud = false;
-        
+
         [Header("Performance Settings")]
         [SerializeField, Range(0.1f, 1.0f)]
         private float _raycastResolutionScale = 0.5f; // Reduce raycast resolution for better performance
