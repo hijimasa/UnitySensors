@@ -1,5 +1,6 @@
 using UnityEngine;
 using Unity.Collections;
+using Unity.Jobs;
 
 using UnitySensors.DataType.LiDAR;
 using UnitySensors.DataType.Sensor;
@@ -24,6 +25,7 @@ namespace UnitySensors.Sensor.LiDAR
         private float _maxIntensity = 255.0f;
 
         private PointCloud<PointXYZI> _pointCloud;
+        protected JobHandle _jobHandle;
 
         protected ScanPattern scanPattern { get => _scanPattern; }
         protected float minRange { get => _minRange; }
@@ -66,6 +68,15 @@ namespace UnitySensors.Sensor.LiDAR
         protected override void OnSensorDestroy()
         {
             _pointCloud.Dispose();
+        }
+
+        /// <summary>
+        /// Completes any pending job that writes to pointCloud.
+        /// Must be called before reading from pointCloud.points to avoid race conditions.
+        /// </summary>
+        public void CompleteJob()
+        {
+            _jobHandle.Complete();
         }
     }
 }

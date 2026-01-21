@@ -399,6 +399,15 @@ namespace UnitySensors.Sensor.Camera
             _rt.Release();
         }
 
+        /// <summary>
+        /// Completes any pending job that writes to pointCloud.
+        /// Must be called before reading from pointCloud.points to avoid race conditions.
+        /// </summary>
+        public void CompleteJob()
+        {
+            _jobHandle.Complete();
+        }
+
 #if !UNITY_6000_0_OR_NEWER
         private void OnRenderImage(RenderTexture source, RenderTexture dest)
         {

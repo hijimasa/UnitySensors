@@ -58,6 +58,8 @@ namespace UnitySensors.Visualization.Sensor
         {
             if (_sourceInterface.pointsNum != _cachedPointsCount) UpdateBuffers();
             _mat.SetMatrix("LocalToWorldMatrix", _transform.localToWorldMatrix);
+            // Ensure any pending job writing to pointCloud is completed before reading
+            _sourceInterface.CompleteJob();
             _pointsBuffer.SetData(_sourceInterface.pointCloud.points);
         }
 
@@ -70,6 +72,8 @@ namespace UnitySensors.Visualization.Sensor
         {
             if (_pointsBuffer != null) _pointsBuffer.Release();
             _pointsBuffer = new ComputeBuffer(_sourceInterface.pointsNum, _bufferSize);
+            // Ensure any pending job writing to pointCloud is completed before reading
+            _sourceInterface.CompleteJob();
             _pointsBuffer.SetData(_sourceInterface.pointCloud.points);
             _mat.SetBuffer("PointsBuffer", _pointsBuffer);
 

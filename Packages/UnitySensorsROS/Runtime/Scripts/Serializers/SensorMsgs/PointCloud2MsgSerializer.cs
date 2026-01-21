@@ -68,6 +68,9 @@ namespace UnitySensors.ROS.Serializer.PointCloud
         {
             _msg.header = _header.Serialize();
 
+            // Ensure any pending job writing to pointCloud is completed before reading
+            _sourceInterface.CompleteJob();
+
             // Copy source data to native array for processing
             _sourceInterface.pointCloud.points.Reinterpret<byte>(PointUtilitiesSO.pointDataSizes[typeof(T)]).CopyTo(_data);
 

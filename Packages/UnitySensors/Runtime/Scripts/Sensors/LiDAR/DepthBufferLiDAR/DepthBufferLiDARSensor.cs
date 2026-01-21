@@ -27,7 +27,6 @@ namespace UnitySensors.Sensor.LiDAR
 
         private Transform _transform;
 
-        private JobHandle _jobHandle;
         private IUpdateGaussianNoisesJob _updateGaussianNoisesJob;
         private ITextureToPointsJob _textureToPointsJob;
 

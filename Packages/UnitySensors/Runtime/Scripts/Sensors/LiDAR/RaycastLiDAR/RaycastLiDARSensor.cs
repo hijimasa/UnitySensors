@@ -17,8 +17,6 @@ namespace UnitySensors.Sensor.LiDAR
         [SerializeField] private LayerMask _raycastLayerMask = 1;
         private Transform _transform;
 
-        private JobHandle _jobHandle;
-
         private IUpdateRaycastCommandsJob _updateRaycastCommandsJob;
         private IUpdateGaussianNoisesJob _updateGaussianNoisesJob;
         private IRaycastHitsToPointsJob _raycastHitsToPointsJob;

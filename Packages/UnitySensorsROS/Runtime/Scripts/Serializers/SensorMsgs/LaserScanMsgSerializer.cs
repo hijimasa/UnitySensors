@@ -69,6 +69,9 @@ namespace UnitySensors.ROS.Serializer.Sensor
         {
             _msg.header = _header.Serialize();
 
+            // Ensure any pending job writing to pointCloud is completed before reading
+            _sourceInterface.CompleteJob();
+
             for (int i = 0; i < _pointsNum; i++)
             {
                 var point = _sourceInterface.pointCloud.points[i];
