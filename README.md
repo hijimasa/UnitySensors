@@ -30,7 +30,7 @@ The following sensors are available inside :
 - RGB Camera
 - RGBD Camera
 - Panoramic Camera
-- Fisheye Camera (Equidistant and [EUCM][external-EUCM-link] models with adjustable parameters)
+- Fisheye Camera ([UCM][external-UCM-link], [EUCM][external-EUCM-link], [Double Sphere][external-DS-link], [Kannala-Brandt (KB4)][external-KB4-link], [OCamCalib][external-OCamCalib-link], and Equidistant models with adjustable parameters)
 - IMU
 - GNSS
 - (GroundTruth)
@@ -98,7 +98,11 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 <!-- LINK GROUP -->
 
+[external-UCM-link]: https://arxiv.org/abs/2407.12405
 [external-EUCM-link]: https://github.com/ethz-asl/kalibr/wiki/supported-models
+[external-DS-link]: https://github.com/ethz-asl/kalibr/wiki/supported-models
+[external-KB4-link]: https://arxiv.org/abs/2407.12405
+[external-OCamCalib-link]: https://arxiv.org/abs/2407.12405
 [external-unity-shield]: https://img.shields.io/badge/Unity3D-%3E%202022.3-blue?style=flat-square&logo=unity
 [external-unity-link]: https://unity.com/
 [external-ros-shield]: https://img.shields.io/badge/ROS-1%7C2-blue?style=flat-square&logo=ros
