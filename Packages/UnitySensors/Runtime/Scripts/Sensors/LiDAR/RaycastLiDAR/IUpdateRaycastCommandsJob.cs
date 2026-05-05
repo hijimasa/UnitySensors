@@ -14,7 +14,7 @@ namespace UnitySensors.Sensor.LiDAR
         [ReadOnly]
         public Vector3 origin;
         [ReadOnly]
-        public Matrix4x4 localToWorldMatrix;
+        public quaternion rotation;
         [ReadOnly]
         public float maxRange;
         [ReadOnly]
@@ -28,7 +28,7 @@ namespace UnitySensors.Sensor.LiDAR
 
         public void Execute(int index)
         {
-            raycastCommands[index] = new(origin, localToWorldMatrix * (Vector3)directions[index + indexOffset], queryParameters, maxRange);
+            raycastCommands[index] = new(origin, math.normalize(math.mul(rotation, directions[index + indexOffset])), queryParameters, maxRange);
         }
     }
 }
