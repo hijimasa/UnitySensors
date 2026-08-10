@@ -17,6 +17,14 @@ namespace UnitySensors.Sensor.GNSS
         private GeoCoordinate _coordinate;
         public GeoCoordinate coordinate { get => _coordinate; }
 
+        /// <summary>
+        /// Configure sensor at runtime (avoids Reflection overhead)
+        /// </summary>
+        public void Configure(GeoCoordinateSystem coordinateSystem)
+        {
+            _coordinateSystem = coordinateSystem;
+        }
+
         protected override void Init()
         {
             _transform = this.transform;

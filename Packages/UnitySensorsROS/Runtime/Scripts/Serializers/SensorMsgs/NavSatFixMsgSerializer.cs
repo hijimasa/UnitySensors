@@ -38,6 +38,16 @@ namespace UnitySensors.ROS.Serializer.Sensor
 
         private IGeoCoordinateInterface _sourceInterface;
 
+        /// <summary>
+        /// Configure serializer at runtime (avoids Reflection overhead)
+        /// </summary>
+        public void Configure(IGeoCoordinateInterface source, HeaderSerializer header)
+        {
+            _source = source as Object;
+            _sourceInterface = source;
+            _header = header;
+        }
+
         public override void Init()
         {
             base.Init();

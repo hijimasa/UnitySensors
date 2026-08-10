@@ -13,9 +13,20 @@ namespace UnitySensors.Sensor.GNSS
         private Transform _transform;
         private GeoCoordinateConverter _converter;
 
+        public GeoCoordinate coordinate { get => _coordinate; }
+
         private void Awake()
         {
             _transform = this.transform;
+            _converter = new GeoCoordinateConverter(_coordinate);
+        }
+
+        /// <summary>
+        /// Configure the geodetic origin at runtime (avoids Reflection overhead)
+        /// </summary>
+        public void Configure(GeoCoordinate coordinate)
+        {
+            _coordinate = coordinate;
             _converter = new GeoCoordinateConverter(_coordinate);
         }
 
