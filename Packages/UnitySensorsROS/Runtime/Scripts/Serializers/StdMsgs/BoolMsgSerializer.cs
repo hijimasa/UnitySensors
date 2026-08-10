@@ -14,6 +14,15 @@ namespace UnitySensors.ROS.Serializer.Std
 
         private IBoolStateInterface _sourceInterface;
 
+        /// <summary>
+        /// Configure serializer at runtime (avoids Reflection overhead)
+        /// </summary>
+        public void Configure(IBoolStateInterface source)
+        {
+            _source = source as Object;
+            _sourceInterface = source;
+        }
+
         public override void Init()
         {
             base.Init();

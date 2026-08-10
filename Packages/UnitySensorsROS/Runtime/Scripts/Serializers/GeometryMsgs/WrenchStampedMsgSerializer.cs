@@ -19,6 +19,16 @@ namespace UnitySensors.ROS.Serializer.Geometry
 
         private IWrenchInterface _sourceInterface;
 
+        /// <summary>
+        /// Configure serializer at runtime (avoids Reflection overhead)
+        /// </summary>
+        public void Configure(IWrenchInterface source, HeaderSerializer header)
+        {
+            _source = source as Object;
+            _sourceInterface = source;
+            _header = header;
+        }
+
         public override void Init()
         {
             base.Init();
