@@ -33,6 +33,7 @@ The following sensors are available inside :
 - Fisheye Camera (Equidistant and [EUCM][external-EUCM-link] models with adjustable parameters)
 - IMU
 - GNSS
+- Contact (Bumper)
 - (GroundTruth)
 - (TF)
 
