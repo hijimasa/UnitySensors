@@ -65,10 +65,12 @@ namespace UnitySensors.Sensor.Camera
     [BurstCompile]
     public struct ConvertHitsToDepthJob : IJobParallelFor
     {
+        [ReadOnly] public float3 cameraPosition;
+        [ReadOnly] public float3 forward;
         [ReadOnly] public float farClipPlane;
         [ReadOnly] public NativeArray<RaycastHit> raycastHits;
 
-        [WriteOnly] public NativeArray<Color32> pixels;
+        [WriteOnly] public NativeArray<Color> pixels;
 
         public void Execute(int index)
         {
@@ -79,11 +81,15 @@ namespace UnitySensors.Sensor.Camera
             // Use distance > 0 to check for valid hits instead
             if (hit.distance > 0)
             {
-                depth = math.clamp(hit.distance / farClipPlane, 0f, 1f);
+                // Planar (camera-forward) depth, matching the render-based path
+                // and what ITextureToPointsJob expects - not the euclidean ray
+                // length. Stored as float: a byte would quantize the depth to
+                // farClipPlane/255 steps (over a meter with a 300 m far plane).
+                float planar = math.dot((float3)hit.point - cameraPosition, forward);
+                depth = math.clamp(planar / farClipPlane, 0f, 1f);
             }
 
-            byte depthByte = (byte)(depth * 255);
-            pixels[index] = new Color32(depthByte, depthByte, depthByte, 255);
+            pixels[index] = new Color(depth, depth, depth, 1f);
         }
     }
 
@@ -111,12 +117,11 @@ namespace UnitySensors.Sensor.Camera
         private Texture2D _depthTexture; // Reuse texture to avoid allocations
         private int _lastRaycastWidth, _lastRaycastHeight;
         private float _lastFrameTime;
-        private Color32[] _pixelBuffer; // Pooled pixel buffer to avoid GC allocations
-
+        
         // Batched raycast resources for URP depth generation
         private NativeArray<RaycastCommand> _raycastCommands;
         private NativeArray<RaycastHit> _raycastHits;
-        private NativeArray<Color32> _nativePixelBuffer;
+        private NativeArray<Color> _nativePixelBuffer;
         private JobHandle _raycastJobHandle;
 
         private JobHandle _jobHandle;
@@ -309,12 +314,11 @@ namespace UnitySensors.Sensor.Camera
                     DestroyImmediate(_depthTexture);
 
                 _depthTexture = new Texture2D(raycastWidth, raycastHeight, TextureFormat.RGBAFloat, false);
-                _pixelBuffer = new Color32[requiredBufferSize]; // Reallocate only when size changes
 
                 // Allocate persistent native arrays for batched raycast
                 _raycastCommands = new NativeArray<RaycastCommand>(requiredBufferSize, Allocator.Persistent);
                 _raycastHits = new NativeArray<RaycastHit>(requiredBufferSize, Allocator.Persistent);
-                _nativePixelBuffer = new NativeArray<Color32>(requiredBufferSize, Allocator.Persistent);
+                _nativePixelBuffer = new NativeArray<Color>(requiredBufferSize, Allocator.Persistent);
 
                 _lastRaycastWidth = raycastWidth;
                 _lastRaycastHeight = raycastHeight;
@@ -359,6 +363,8 @@ namespace UnitySensors.Sensor.Camera
             // Convert hits to depth pixels using Burst-compiled job
             var convertJob = new ConvertHitsToDepthJob
             {
+                cameraPosition = cameraPos,
+                forward = forward,
                 farClipPlane = _camera.farClipPlane,
                 raycastHits = _raycastHits,
                 pixels = _nativePixelBuffer
@@ -367,11 +373,8 @@ namespace UnitySensors.Sensor.Camera
             JobHandle convertHandle = convertJob.Schedule(requiredBufferSize, 2048, _raycastJobHandle);
             convertHandle.Complete();
 
-            // Copy native buffer to managed array for texture upload
-            _nativePixelBuffer.CopyTo(_pixelBuffer);
-
-            // Apply pixels and scale to target resolution
-            _depthTexture.SetPixels32(_pixelBuffer);
+            // Upload the float pixels directly (RGBAFloat texture)
+            _depthTexture.SetPixelData(_nativePixelBuffer, 0);
             _depthTexture.Apply();
 
             // Scale to target resolution if needed
