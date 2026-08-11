@@ -65,7 +65,7 @@ namespace UnitySensors.Sensor.LiDAR
             _updateRaycastCommandsJob = new IUpdateRaycastCommandsJob()
             {
                 origin = _transform.position,
-                localToWorldMatrix = _transform.localToWorldMatrix,
+                rotation = _transform.rotation,
                 maxRange = maxRange,
                 queryParameters = new() { layerMask = _raycastLayerMask },
                 directions = _directions,
@@ -98,7 +98,7 @@ namespace UnitySensors.Sensor.LiDAR
         protected override IEnumerator UpdateSensor()
         {
             _updateRaycastCommandsJob.origin = _transform.position;
-            _updateRaycastCommandsJob.localToWorldMatrix = _transform.localToWorldMatrix;
+            _updateRaycastCommandsJob.rotation = _transform.rotation;
 
             // Use larger batch sizes for better job efficiency
             JobHandle updateRaycastCommandsJobHandle = _updateRaycastCommandsJob.Schedule(pointsNum, 2048);

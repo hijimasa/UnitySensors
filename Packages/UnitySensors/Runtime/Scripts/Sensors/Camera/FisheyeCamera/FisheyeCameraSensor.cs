@@ -9,8 +9,12 @@ namespace UnitySensors.Sensor.Camera
     {
         public enum CameraModel
         {
-            Equidistant,
-            EUCM
+            UCM,
+            EUCM,
+            DS,
+            KB4,
+            OCAM,
+            Equidistant
         }
         [SerializeField]
         private Material _fisheyeMat;
@@ -24,6 +28,22 @@ namespace UnitySensors.Sensor.Camera
         internal float _alpha = 1.0f;
         [SerializeField, Min(0)]
         internal float _beta = 0.0f;
+        [SerializeField]
+        internal float _xi = 0.34f;
+        [SerializeField]
+        internal Vector4 _kb4 = new Vector4(-0.01f, 0.03f, -0.02f, 0.005f);
+        [SerializeField]
+        internal Vector4 _affineCoeffs = new Vector4(1.0f, 0.0f, 0.0f, 1.0f);//c d e 1
+        [SerializeField]
+        internal float _a0 = 190.87f;
+        [SerializeField]
+        internal float _a1 = 0.0f;
+        [SerializeField]
+        internal float _a2 = 0.0f;
+        [SerializeField]
+        internal float _a3 = -0.000003f;
+        [SerializeField]
+        internal float _a4 = 0.0f;
         [SerializeField]
         internal Vector2 _focalLength = new Vector2(1.0f, 1.0f);
         [SerializeField]
@@ -81,14 +101,24 @@ namespace UnitySensors.Sensor.Camera
         {
             m_camera.RenderToCubemap(_cubemap);
 
-            _fisheyeMat.SetInteger("_Equidistant", _cameraModel == CameraModel.Equidistant ? 1 : 0);
+            _fisheyeMat.SetFloat("_CameraModel", (int)_cameraModel);
             _fisheyeMat.SetFloat("_Angle", _viewAngle);
             _fisheyeMat.SetFloat("_alpha", _alpha);
             _fisheyeMat.SetFloat("_beta", _beta);
+            _fisheyeMat.SetFloat("_xi", _xi);
+            _fisheyeMat.SetVector("_kb4", _kb4);
+            _fisheyeMat.SetVector("_affineCoeffs", _affineCoeffs);
+            _fisheyeMat.SetFloat("_a0", _a0);
+            _fisheyeMat.SetFloat("_a1", _a1);
+            _fisheyeMat.SetFloat("_a2", _a2);
+            _fisheyeMat.SetFloat("_a3", _a3);
+            _fisheyeMat.SetFloat("_a4", _a4);
             _fisheyeMat.SetFloat("_fx", _focalLength.x / _resolution.x);
             _fisheyeMat.SetFloat("_fy", _focalLength.y / _resolution.y);
             _fisheyeMat.SetFloat("_cx", _principalPoint.x / _resolution.x);
             _fisheyeMat.SetFloat("_cy", 1 - _principalPoint.y / _resolution.y);
+            _fisheyeMat.SetFloat(" _resolutionX", _resolution.x);
+            _fisheyeMat.SetFloat(" _resolutionY", _resolution.y);
             var eulerAngles = transform.rotation.eulerAngles;
             var rot = Quaternion.Euler(eulerAngles.x, eulerAngles.y, eulerAngles.z);
             var mat = Matrix4x4.TRS(Vector3.zero, rot, Vector3.one);
