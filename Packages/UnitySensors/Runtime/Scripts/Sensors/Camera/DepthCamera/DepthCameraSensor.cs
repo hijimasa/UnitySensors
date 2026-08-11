@@ -93,6 +93,31 @@ namespace UnitySensors.Sensor.Camera
         }
     }
 
+    /// <summary>
+    /// Nearest-neighbor upscale of the (possibly adaptive-resolution) raycast
+    /// depth pixels into a full-resolution pixel buffer. Used on the CPU-only
+    /// path where Graphics.Blit is unavailable.
+    /// </summary>
+    [BurstCompile]
+    public struct UpscaleDepthPixelsJob : IJobParallelFor
+    {
+        [ReadOnly] public int srcWidth;
+        [ReadOnly] public int srcHeight;
+        [ReadOnly] public int dstWidth;
+        [ReadOnly] public int dstHeight;
+        [ReadOnly] public NativeArray<Color> src;
+        [WriteOnly] public NativeArray<Color> dst;
+
+        public void Execute(int index)
+        {
+            int x = index % dstWidth;
+            int y = index / dstWidth;
+            int sx = x * srcWidth / dstWidth;
+            int sy = y * srcHeight / dstHeight;
+            dst[index] = src[sy * srcWidth + sx];
+        }
+    }
+
     [RequireComponent(typeof(UnityEngine.Camera))]
     public class DepthCameraSensor : CameraSensor, IPointCloudInterface<PointXYZ>
     {
@@ -285,24 +310,43 @@ namespace UnitySensors.Sensor.Camera
 
         protected override IEnumerator UpdateSensor()
         {
+            bool loaded;
 #if UNITY_6000_0_OR_NEWER
             bool isURP = GraphicsSettings.currentRenderPipeline != null;
 
             if (isURP)
             {
                 GenerateDepthImageUsingRaycast();
+                if (SystemInfo.supportsAsyncGPUReadback)
+                {
+                    yield return _textureLoader.LoadTextureAsync();
+                    loaded = _textureLoader.success;
+                }
+                else
+                {
+                    // Headless (-batchmode -nographics): the depth was computed
+                    // on the CPU by the raycast path, so copy it into the
+                    // destination texture directly instead of bouncing it
+                    // through the GPU - the Null device cannot read back, which
+                    // previously left the published image as uninitialized
+                    // memory.
+                    CopyRaycastDepthToTexture();
+                    loaded = true;
+                }
             }
             else
             {
                 _camera.Render();
+                yield return _textureLoader.LoadTextureAsync();
+                loaded = _textureLoader.success;
             }
 #else
             _camera.Render();
+            yield return _textureLoader.LoadTextureAsync();
+            loaded = _textureLoader.success;
 #endif
 
-            yield return _textureLoader.LoadTextureAsync();
-
-            if (_textureLoader.success && _convertToPointCloud)
+            if (loaded && _convertToPointCloud)
             {
                 JobHandle updateGaussianNoisesJobHandle = _updateGaussianNoisesJob.Schedule(_pointsNum, 2048);
                 _jobHandle = _textureToPointsJob.Schedule(_pointsNum, 2048, updateGaussianNoisesJobHandle);
@@ -428,6 +472,39 @@ namespace UnitySensors.Sensor.Camera
                 RenderTexture.active = _rt;
                 Graphics.CopyTexture(_depthTexture, _rt);
                 RenderTexture.active = null;
+            }
+        }
+
+        /// <summary>
+        /// CPU-only delivery of the raycast depth image: write the raycast
+        /// pixel buffer straight into the destination texture (with a
+        /// nearest-neighbor upscale when adaptive resolution reduced the
+        /// raycast grid). Used when async GPU readback is unavailable
+        /// (-nographics); consumers of texture0 read its CPU-side data.
+        /// </summary>
+        private void CopyRaycastDepthToTexture()
+        {
+            var dst = _texture.GetPixelData<Color>(0);
+            if (_lastRaycastWidth == _texture.width && _lastRaycastHeight == _texture.height)
+            {
+                dst.CopyFrom(_nativePixelBuffer);
+            }
+            else
+            {
+                var upscaleJob = new UpscaleDepthPixelsJob
+                {
+                    srcWidth = _lastRaycastWidth,
+                    srcHeight = _lastRaycastHeight,
+                    dstWidth = _texture.width,
+                    dstHeight = _texture.height,
+                    src = _nativePixelBuffer,
+                    dst = dst
+                };
+                upscaleJob.Schedule(dst.Length, 2048).Complete();
+            }
+            if (SystemInfo.graphicsDeviceType != UnityEngine.Rendering.GraphicsDeviceType.Null)
+            {
+                _texture.Apply(false);
             }
         }
 
