@@ -73,7 +73,23 @@ namespace UnitySensors.Sensor.Camera
         public override Texture2D texture1 { get => _colorTexture; }
         public PointCloud<PointXYZRGB> pointCloud { get => _pointCloud; }
         public int pointsNum { get => _pointsNum; }
-        public bool convertToPointCloud { get => _convertToPointCloud; set => _convertToPointCloud = value; }
+        public bool convertToPointCloud
+        {
+            get => _convertToPointCloud;
+            set
+            {
+                // Support enabling after Init() (e.g. when a visualizer is
+                // attached at runtime): allocate the point cloud lazily.
+                // _depthTexture is only set from Init(), so before Init() the
+                // flag alone is enough and Init() allocates as before.
+                if (value && !_directions.IsCreated && _depthTexture != null)
+                {
+                    SetupDirections();
+                    SetupJob();
+                }
+                _convertToPointCloud = value;
+            }
+        }
 
         private TextureLoader _depthTextureLoader, _colorTextureLoader;
 
@@ -346,7 +362,9 @@ namespace UnitySensors.Sensor.Camera
 
         protected override void OnSensorDestroy()
         {
-            if (_convertToPointCloud)
+            // Dispose on allocation, not on the flag: the flag may have been
+            // turned off again after a runtime visualizer allocated the arrays.
+            if (_directions.IsCreated)
             {
                 _jobHandle.Complete();
                 _pointCloud.Dispose();

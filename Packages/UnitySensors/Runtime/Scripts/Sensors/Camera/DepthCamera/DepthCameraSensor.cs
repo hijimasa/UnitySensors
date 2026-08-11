@@ -133,7 +133,23 @@ namespace UnitySensors.Sensor.Camera
         public PointCloud<PointXYZ> pointCloud { get => _pointCloud; }
         public int pointsNum { get => _pointsNum; }
 
-        public bool convertToPointCloud { get => _convertToPointCloud; set => _convertToPointCloud = value; }
+        public bool convertToPointCloud
+        {
+            get => _convertToPointCloud;
+            set
+            {
+                // Support enabling after Init() (e.g. when a visualizer is
+                // attached at runtime): allocate the point cloud lazily.
+                // _texture is only set from Init(), so before Init() the flag
+                // alone is enough and Init() allocates as before.
+                if (value && !_directions.IsCreated && _texture != null)
+                {
+                    SetupDirections();
+                    SetupJob();
+                }
+                _convertToPointCloud = value;
+            }
+        }
 
         /// <summary>
         /// Configure depth camera sensor at runtime (avoids Reflection overhead)
@@ -376,7 +392,9 @@ namespace UnitySensors.Sensor.Camera
 
         protected override void OnSensorDestroy()
         {
-            if (_convertToPointCloud)
+            // Dispose on allocation, not on the flag: the flag may have been
+            // turned off again after a runtime visualizer allocated the arrays.
+            if (_directions.IsCreated)
             {
                 _jobHandle.Complete();
                 _pointCloud.Dispose();

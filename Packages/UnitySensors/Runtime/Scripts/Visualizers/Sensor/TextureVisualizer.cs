@@ -21,6 +21,14 @@ namespace UnitySensors.Visualization.Sensor
         [SerializeField]
         private RawImage _image;
         private ITextureInterface _sourceInterface;
+
+        public void Configure(Object source, RawImage image, bool useTexture1 = false)
+        {
+            _source = source;
+            _image = image;
+            _sourceTexture = useTexture1 ? SourceTexture.Texture1 : SourceTexture.Texture0;
+        }
+
         private void Start()
         {
             _sourceInterface = _source as ITextureInterface;
@@ -36,8 +44,19 @@ namespace UnitySensors.Visualization.Sensor
 
         protected override void Visualize()
         {
-            if (!_image) return;
+            if (!_image || _sourceInterface == null) return;
             _image.texture = _sourceTexture == SourceTexture.Texture0 ? _sourceInterface.texture0 : _sourceInterface.texture1;
         }
+
+        private void OnDestroy()
+        {
+            // Runtime toggling: without this, a destroyed visualizer keeps
+            // receiving sensor updates and touches released buffers.
+            if (_source is UnitySensor)
+            {
+                (_source as UnitySensor).onSensorUpdateComplete -= Visualize;
+            }
+        }
+
     }
 }

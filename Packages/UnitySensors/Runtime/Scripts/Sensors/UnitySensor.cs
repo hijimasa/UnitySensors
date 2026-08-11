@@ -96,7 +96,17 @@ namespace UnitySensors.Sensor
         public virtual IEnumerator UpdateSensorOnce()
         {
             yield return UpdateSensor();
-            onSensorUpdateComplete?.Invoke();
+            try
+            {
+                onSensorUpdateComplete?.Invoke();
+            }
+            catch (Exception e)
+            {
+                // A faulty subscriber (e.g. a visualizer mid-teardown) must not
+                // kill this coroutine: an uncaught exception here would silently
+                // stop the sensor from ever updating again.
+                Debug.LogException(e);
+            }
         }
 
         protected abstract void Init();

@@ -22,6 +22,13 @@ namespace UnitySensors.Utils.PointCloud
             { typeof(PointXYZRGB), 16 }
         });
 
+        public void Configure(Material pointCloudXYZMaterial, Material pointCloudXYZIMaterial, Material pointCloudXYZRGBMaterial)
+        {
+            _pointCloudXYZMaterial = pointCloudXYZMaterial;
+            _pointCloudXYZIMaterial = pointCloudXYZIMaterial;
+            _pointCloudXYZRGBMaterial = pointCloudXYZRGBMaterial;
+        }
+
         public Material GetPointMaterialTemplate(Type type)
         {
             if (type == typeof(PointXYZ))

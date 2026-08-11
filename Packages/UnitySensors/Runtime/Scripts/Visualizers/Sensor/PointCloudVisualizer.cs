@@ -8,6 +8,7 @@ namespace UnitySensors.Visualization.Sensor
     public class PointCloudVisualizer<T> : Visualizer where T : struct, IPointInterface
     {
         [SerializeField] private PointUtilitiesSO _pointUtilitiesSO;
+        [SerializeField] private int _drawLayer = 0;
         private IPointCloudInterface<T> _sourceInterface;
         private Transform _transform;
 
@@ -23,6 +24,12 @@ namespace UnitySensors.Visualization.Sensor
         public void SetSource(IPointCloudInterface<T> sourceInterface)
         {
             _sourceInterface = sourceInterface;
+        }
+
+        public void Configure(PointUtilitiesSO pointUtilitiesSO, int drawLayer = 0)
+        {
+            _pointUtilitiesSO = pointUtilitiesSO;
+            _drawLayer = drawLayer;
         }
 
         protected virtual void Start()
@@ -56,6 +63,9 @@ namespace UnitySensors.Visualization.Sensor
 
         protected override void Visualize()
         {
+            // The visualizer can receive a sensor update while partially torn
+            // down (buffers already released) or before Start() has run.
+            if (_sourceInterface == null || _argsBuffer == null) return;
             if (_sourceInterface.pointsNum != _cachedPointsCount) UpdateBuffers();
             _mat.SetMatrix("LocalToWorldMatrix", _transform.localToWorldMatrix);
             // Ensure any pending job writing to pointCloud is completed before reading
@@ -65,7 +75,8 @@ namespace UnitySensors.Visualization.Sensor
 
         private void Update()
         {
-            Graphics.DrawMeshInstancedIndirect(_mesh, 0, _mat, new Bounds(Vector3.zero, new Vector3(100.0f, 100.0f, 100.0f)), _argsBuffer);
+            Graphics.DrawMeshInstancedIndirect(_mesh, 0, _mat, new Bounds(Vector3.zero, new Vector3(100.0f, 100.0f, 100.0f)), _argsBuffer,
+                0, null, UnityEngine.Rendering.ShadowCastingMode.Off, false, _drawLayer);
         }
 
         private void UpdateBuffers()
