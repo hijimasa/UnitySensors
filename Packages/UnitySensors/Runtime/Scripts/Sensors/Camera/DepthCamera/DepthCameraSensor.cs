@@ -201,19 +201,57 @@ namespace UnitySensors.Sensor.Camera
             }
         }
 
+        protected override void ReleaseSensorResources()
+        {
+            if (_camera != null) _camera.targetTexture = null;
+            if (_rt != null)
+            {
+                _rt.Release();
+                Destroy(_rt);
+                _rt = null;
+            }
+            if (_texture != null)
+            {
+                Destroy(_texture);
+                _texture = null;
+            }
+            if (_directions.IsCreated)
+            {
+                _jobHandle.Complete();
+                _pointCloud.Dispose();
+                _noises.Dispose();
+                _directions.Dispose();
+                _pointsNum = 0;
+            }
+            // レイキャスト系のキャッシュはサイズ照合で作り直されるため、
+            // テクスチャだけ破棄してサイズ記憶をリセットする。
+            if (_depthTexture != null)
+            {
+                DestroyImmediate(_depthTexture);
+                _depthTexture = null;
+                _lastRaycastWidth = _lastRaycastHeight = 0;
+            }
+        }
+
         private void SetupDirections()
         {
-            _pointsNum = _resolution.x * _resolution.y;
+            // Derive the grid from the actual depth texture, not _resolution:
+            // when the component is added at runtime, Init() may have created
+            // the texture before Configure() changed _resolution, and the
+            // direction table must match the pixel buffer layout exactly.
+            int width = _texture.width;
+            int height = _texture.height;
+            _pointsNum = width * height;
 
             _directions = new NativeArray<float3>(_pointsNum, Allocator.Persistent);
 
-            float z = _resolution.y * 0.5f / Mathf.Tan(m_camera.fieldOfView * 0.5f * Mathf.Deg2Rad);
-            for (int y = 0; y < _resolution.y; y++)
+            float z = height * 0.5f / Mathf.Tan(m_camera.fieldOfView * 0.5f * Mathf.Deg2Rad);
+            for (int y = 0; y < height; y++)
             {
-                for (int x = 0; x < _resolution.x; x++)
+                for (int x = 0; x < width; x++)
                 {
-                    Vector3 vec = new Vector3(-_resolution.x / 2 + x, -_resolution.y / 2 + y, z);
-                    _directions[y * _resolution.x + x] = vec.normalized;
+                    Vector3 vec = new Vector3(-width / 2 + x, -height / 2 + y, z);
+                    _directions[y * width + x] = vec.normalized;
                 }
             }
         }

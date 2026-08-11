@@ -26,6 +26,22 @@ namespace UnitySensors.Sensor.Camera
             };
         }
 
+        protected override void ReleaseSensorResources()
+        {
+            if (_camera != null) _camera.targetTexture = null;
+            if (_rt != null)
+            {
+                _rt.Release();
+                Destroy(_rt);
+                _rt = null;
+            }
+            if (_texture != null)
+            {
+                Destroy(_texture);
+                _texture = null;
+            }
+        }
+
         protected override IEnumerator UpdateSensor()
         {
             _camera.Render();

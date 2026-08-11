@@ -34,6 +34,22 @@ namespace UnitySensors.Sensor.Camera
             _fov = fov;
         }
 
+        /// <summary>
+        /// Re-run Init() with the current configuration. Call after Configure()
+        /// when the component was added at runtime: Awake() has already built
+        /// the sensor with default settings by the time Configure() can run,
+        /// so the render targets and camera parameters need to be rebuilt.
+        /// (Same convention as LiDARSensor.Initialize().)
+        /// </summary>
+        public void Initialize()
+        {
+            ReleaseSensorResources();
+            Init();
+        }
+
+        /// <summary>Release everything Init() created so it can run again.</summary>
+        protected virtual void ReleaseSensorResources() { }
+
         protected override void Init()
         {
             _camera = GetComponent<UnityEngine.Camera>();
