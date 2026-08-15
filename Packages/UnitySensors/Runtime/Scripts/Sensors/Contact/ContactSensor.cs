@@ -18,6 +18,8 @@ namespace UnitySensors.Sensor.Contact
 
         private Dictionary<Collider, ContactData> _activeContacts = new Dictionary<Collider, ContactData>();
         private List<Collider> _removeBuffer = new List<Collider>();
+        // Colliders that belong to this sensor. Empty means "anything that reaches me".
+        private HashSet<Collider> _ownColliders = new HashSet<Collider>();
         private Vector3 _totalForce;
         private Vector3 _totalTorque;
 
@@ -36,14 +38,42 @@ namespace UnitySensors.Sensor.Contact
 
         protected override void Init()
         {
-            // OnCollision* messages are delivered to the GameObject that holds
-            // the touched collider, which for articulated robots is usually a
-            // collider-only child of the body link. Put a relay on each of those
-            // children so their events reach this sensor. Children that have
-            // their own Rigidbody/ArticulationBody belong to another body, so
-            // recursion stops there; use RegisterCollider() to cover colliders
-            // outside this default scan.
+            // Unity delivers OnCollision* only to the GameObject that carries the
+            // Rigidbody/ArticulationBody - never to a collider-only child. Relays on the
+            // children therefore fire for the case where the sensor sits on the body
+            // itself and the colliders hang below it, but not for a sensor on a part that
+            // shares a body with its parent. RegisterBodyRelay() covers the latter.
             AttachRelays(transform);
+        }
+
+        /// <summary>
+        /// Listen to the collisions of a body this sensor does not own, keeping only the
+        /// ones that touched a collider registered through <see cref="RegisterOwnCollider"/>.
+        /// </summary>
+        /// <remarks>
+        /// A URDF link attached by a fixed joint has no body of its own - its colliders
+        /// belong to the nearest ancestor that has one, and that ancestor is where Unity
+        /// sends the collision. Without this the sensor hears nothing; with this but no
+        /// own-collider filter it would report every contact of the whole assembly, so a
+        /// bumper brushing a wall would read as a hit on the plate.
+        /// </remarks>
+        public void RegisterBodyRelay(GameObject bodyObject)
+        {
+            if (bodyObject == null || bodyObject == gameObject) return;
+            foreach (ContactEventRelay existing in bodyObject.GetComponents<ContactEventRelay>())
+            {
+                if (existing.Target == this) return;
+            }
+            bodyObject.AddComponent<ContactEventRelay>().Initialize(this);
+        }
+
+        /// <summary>
+        /// Declare a collider as belonging to this sensor. Once any is declared, contacts
+        /// on other colliders of the same body are ignored.
+        /// </summary>
+        public void RegisterOwnCollider(Collider collider)
+        {
+            if (collider != null) _ownColliders.Add(collider);
         }
 
         /// <summary>
@@ -117,12 +147,32 @@ namespace UnitySensors.Sensor.Contact
         {
             if (collision.contactCount == 0) return;
 
-            ContactPoint contactPoint = collision.GetContact(0);
+            // Walk every contact point: one Collision can carry points on several of the
+            // body's colliders, and only some of them may be ours.
+            int matched = 0;
+            ContactPoint mine = default;
+            for (int i = 0; i < collision.contactCount; i++)
+            {
+                ContactPoint point = collision.GetContact(i);
+                if (_ownColliders.Count > 0 && !_ownColliders.Contains(point.thisCollider)) continue;
+                if (matched == 0) mine = point;
+                matched++;
+            }
+            if (matched == 0)
+            {
+                // Nothing on our side of the assembly was touched.
+                _activeContacts.Remove(collision.collider);
+                return;
+            }
+
             ContactData contact = new ContactData();
             contact.colliderName = collision.collider.name;
-            contact.position = contactPoint.point;
-            contact.normal = contactPoint.normal;
-            contact.force = collision.impulse / Time.fixedDeltaTime;
+            contact.position = mine.point;
+            contact.normal = mine.normal;
+            // impulse is reported per collider pair, so when only part of the contact
+            // points are ours the force is scaled by their share rather than measured.
+            contact.force = collision.impulse / Time.fixedDeltaTime
+                            * ((float)matched / collision.contactCount);
             _activeContacts[collision.collider] = contact;
         }
 
