@@ -9,12 +9,14 @@ using UnitySensors.Interface.Std;
 
 namespace UnitySensors.Sensor.Contact
 {
-    public class ContactSensor : UnitySensor, IContactDataInterface, IBoolStateInterface, IWrenchInterface
+    public class ContactSensor : UnitySensor, IContactDataInterface, IBoolStateInterface, IWrenchInterface, IIntStateInterface
     {
         [SerializeField, ReadOnly]
         private bool _isContact;
         [SerializeField, ReadOnly]
         private List<ContactData> _contacts = new List<ContactData>();
+        [SerializeField, ReadOnly]
+        private int _contactCount;
 
         private Dictionary<Collider, ContactData> _activeContacts = new Dictionary<Collider, ContactData>();
         private List<Collider> _removeBuffer = new List<Collider>();
@@ -22,8 +24,23 @@ namespace UnitySensors.Sensor.Contact
         private HashSet<Collider> _ownColliders = new HashSet<Collider>();
         private Vector3 _totalForce;
         private Vector3 _totalTorque;
+        // Set the moment a collider arrives, cleared when the sensor samples. Collisions
+        // are delivered in FixedUpdate, which runs far more often than the sensor
+        // samples, so a touch that also ends between two samples would otherwise leave
+        // no trace at all: OnCollisionExit removes it from _activeContacts before
+        // UpdateSensor ever looks. A projectile bouncing off a plate lasts only a few
+        // physics steps, so without this latch those hits are simply never reported.
+        private bool _contactedSinceLastSample;
 
         public bool isContact { get => _isContact; }
+        /// <summary>
+        /// Number of times a collider started touching this sensor, counted since
+        /// startup and never reset. Consumers take the difference between two readings,
+        /// which stays correct even when several arrivals fall inside one sample
+        /// period - unlike <see cref="isContact"/>, whose rising edge merges them into
+        /// one. An object that arrives once and rests counts once.
+        /// </summary>
+        public int contactCount { get => _contactCount; }
         public Vector3 totalForce { get => _totalForce; }
         public Vector3 totalTorque { get => _totalTorque; }
         public Vector3 localTotalForce { get => transform.InverseTransformDirection(_totalForce); }
@@ -33,6 +50,7 @@ namespace UnitySensors.Sensor.Contact
         // Generic serializer sources: bumper state and the net contact wrench
         // in the sensor's local frame.
         bool IBoolStateInterface.state { get => _isContact; }
+        int IIntStateInterface.state { get => _contactCount; }
         Vector3 IWrenchInterface.force { get => localTotalForce; }
         Vector3 IWrenchInterface.torque { get => localTotalTorque; }
 
@@ -173,6 +191,13 @@ namespace UnitySensors.Sensor.Contact
             // points are ours the force is scaled by their share rather than measured.
             contact.force = collision.impulse / Time.fixedDeltaTime
                             * ((float)matched / collision.contactCount);
+            // Count arrivals only. OnCollisionStay repeats every physics step for as
+            // long as the object rests here, and those must not each count as a hit.
+            if (!_activeContacts.ContainsKey(collision.collider))
+            {
+                _contactCount++;
+                _contactedSinceLastSample = true;
+            }
             _activeContacts[collision.collider] = contact;
         }
 
@@ -201,7 +226,10 @@ namespace UnitySensors.Sensor.Contact
                 _totalForce += contact.force;
                 _totalTorque += Vector3.Cross(contact.position - origin, contact.force);
             }
-            _isContact = _contacts.Count > 0;
+            // A touch that began and ended since the last sample is gone from
+            // _activeContacts but still happened, so report it once here.
+            _isContact = _contacts.Count > 0 || _contactedSinceLastSample;
+            _contactedSinceLastSample = false;
 
             yield return null;
         }
