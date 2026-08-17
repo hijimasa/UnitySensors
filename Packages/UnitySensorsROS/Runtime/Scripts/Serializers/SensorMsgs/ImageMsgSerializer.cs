@@ -118,7 +118,10 @@ namespace UnitySensors.ROS.Serializer.Sensor
             _imageEncodeJob.targetTextureRawData = _encodedTexture.GetRawTextureData<byte>();
             _imageEncodeJob.Schedule(_width * _height, 1024).Complete();
 
-            _encodedTexture.Apply();
+            // No Apply() here on purpose. _encodedTexture is only ever a CPU-side
+            // staging buffer for the job above, and the bytes leave through
+            // GetRawTextureData below; Apply() would upload them to the GPU, where
+            // nothing reads them. At 720p that is 2.76 MB of pure waste per image.
 
             // Manually copy the data to the message to avoid GC allocation
             _encodedTexture.GetRawTextureData<byte>().CopyTo(_msg.data);
