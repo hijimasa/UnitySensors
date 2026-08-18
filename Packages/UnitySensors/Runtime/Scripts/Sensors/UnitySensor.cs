@@ -77,9 +77,27 @@ namespace UnitySensors.Sensor
                 });
 
                 _time = Time.time;
+
+                // 更新に要した時間も周期に算入する。UpdateSensorOnce は
+                // 数フレームまたぐことがある (カメラは AsyncGPUReadback の完了を
+                // 待つ) ので、待っている間の経過を数えないと、実際の周期が
+                // 「指定周期 + 更新時間」になってしまう。
+                //
+                // 実測 (960x540 のカメラ、指定 10 Hz):
+                //   描画 10 FPS -> 0.400 s (2.5 Hz)  読み戻し 3 フレーム
+                //   描画 30 FPS -> 0.167 s (6.0 Hz)  読み戻し 2 フレーム
+                //   描画 60 FPS -> 0.133 s (7.5 Hz)  読み戻し 2 フレーム
+                // いずれも「1/f + 読み戻し / 描画レート」に一致していた。
+                // これで周期は max(1/f, 更新時間) になる。
+                float updateStart = Time.time;
                 yield return UpdateSensorOnce();
+                _dt += Time.time - updateStart;
 
                 _dt -= _frequency_inv;
+
+                // 更新が周期より遅いセンサで _dt が際限なく積み上がると、
+                // 負荷が下がった瞬間にまとめて連続更新してしまう。1 周期ぶんで頭打ちにする。
+                if (_dt > _frequency_inv) _dt = _frequency_inv;
             }
         }
 
