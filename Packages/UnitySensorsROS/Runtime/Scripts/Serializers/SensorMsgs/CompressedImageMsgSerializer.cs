@@ -32,12 +32,15 @@ namespace UnitySensors.ROS.Serializer.Sensor
         /// <summary>
         /// Configure serializer at runtime (avoids Reflection overhead)
         /// </summary>
-        public void Configure(ITextureInterface source, HeaderSerializer header, int sourceTextureIndex)
+        public void Configure(ITextureInterface source, HeaderSerializer header, int sourceTextureIndex, int jpegQuality = 0)
         {
             _source = source as Object;
             _sourceInterface = source;
             _header = header;
             _sourceTexture = (SourceTexture)sourceTextureIndex;
+            // 0 は「指定なし」。既定の 75 のまま置いておく。品質は転送量に
+            // 直接効くので、帯域が苦しい構成では呼び出し側から下げられるようにする。
+            if (jpegQuality > 0) quality = Mathf.Clamp(jpegQuality, 1, 100);
         }
 
         public override void Init()
