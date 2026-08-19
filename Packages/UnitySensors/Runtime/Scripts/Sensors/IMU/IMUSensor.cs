@@ -70,6 +70,19 @@ namespace UnitySensors.Sensor.IMU
 
             _rotation_tmp = _transform.rotation;
             Quaternion rotation_delta = Quaternion.Inverse(_rotation_last) * _rotation_tmp;
+            // Quaternions double-cover rotations (q and -q are the same
+            // rotation), and consecutive transform.rotation samples can land
+            // on opposite hemispheres once the accumulated rotation passes a
+            // multiple of 2*pi. ToAngleAxis on such a delta reports the LONG
+            // way around -- ~(360 deg - delta) about the inverted axis -- so
+            // the angular velocity spikes to ~2*pi/dt for one sample
+            // (Field-Robotics-Japan/UnitySensors#155). Fold the delta onto
+            // the w >= 0 hemisphere so the short arc is always measured.
+            if (rotation_delta.w < 0.0f)
+            {
+                rotation_delta = new Quaternion(
+                    -rotation_delta.x, -rotation_delta.y, -rotation_delta.z, -rotation_delta.w);
+            }
             rotation_delta.ToAngleAxis(out float angle, out Vector3 axis);
             float angularSpeed = (angle * Mathf.Deg2Rad) / dt;
             _angularVelocity_tmp = axis * angularSpeed;
