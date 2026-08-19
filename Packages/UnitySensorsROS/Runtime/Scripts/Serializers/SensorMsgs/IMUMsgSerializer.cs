@@ -40,7 +40,12 @@ namespace UnitySensors.ROS.Serializer.Sensor
             _msg.header = _header.Serialize();
             _msg.linear_acceleration = _sourceInterface.acceleration.To<FLU>();
             _msg.orientation = _sourceInterface.rotation.To<FLU>();
-            _msg.angular_velocity = _sourceInterface.angularVelocity.To<FLU>();
+            // Angular velocity is a pseudo-vector: mapping it from Unity's
+            // left-handed frame to ROS's right-handed FLU needs a negation on
+            // top of the axis swap (same convention as Unity Robotics' own
+            // examples, e.g. -rigidbody.angularVelocity.To<FLU>()). Without it
+            // a CCW yaw in ROS terms is published as a negative z rate.
+            _msg.angular_velocity = (-_sourceInterface.angularVelocity).To<FLU>();
             return _msg;
         }
     }
