@@ -70,6 +70,12 @@ namespace UnitySensors.Sensor.GNSS
         {
             _transform = this.transform;
             BuildConstellation();
+            // Measure straight away. The publisher runs on its own timer and can fire
+            // before the sensor's first update, and an unmeasured sky view reads as
+            // "no satellites at all" -- which a receiver model would quite reasonably
+            // turn into a loss of fix. One real measurement here costs 24 rays and
+            // removes that spurious dropout at spawn.
+            Measure();
         }
 
         private void BuildConstellation()
