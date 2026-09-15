@@ -35,5 +35,29 @@ namespace UnitySensors.Sensor.GNSS
             Vector3 localPosition = _transform.InverseTransformPoint(worldPosition);
             return _converter.Convert(new Vector3D(localPosition));
         }
+
+        /// <summary>Local position of <paramref name="worldPosition"/> in this origin's frame.</summary>
+        public Vector3 ToLocal(Vector3 worldPosition)
+        {
+            return _transform.InverseTransformPoint(worldPosition);
+        }
+
+        /// <summary>
+        /// Geodetic position of an ENU offset from this origin.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="GetCoordinate"/> reads a Unity world position through the
+        /// converter's own axis convention, which takes Unity x as easting and z as
+        /// northing. A host application whose world frame does not agree with that
+        /// -- one publishing ROS ENU, where east is Unity +z and north is Unity -x --
+        /// would otherwise get a fix rotated by ninety degrees against its own
+        /// ground truth, an error that grows with distance from the origin and is
+        /// invisible unless something decodes the fix and compares. Such an
+        /// application should state the ENU offset here instead.
+        /// </remarks>
+        public GeoCoordinate GetCoordinateFromEnu(double east, double north, double up)
+        {
+            return _converter.Convert(new Vector3D((float)east, (float)up, (float)north));
+        }
     }
 }
