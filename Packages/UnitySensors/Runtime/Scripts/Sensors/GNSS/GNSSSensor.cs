@@ -50,10 +50,21 @@ namespace UnitySensors.Sensor.GNSS
         private readonly List<ushort> _lineOfSight = new List<ushort>();
         private float _lastMeasured = -1.0f;
         private bool _skyViewSearched;
+        private GnssSkyView _sky = GnssSkyView.None;
+        private float _groundSpeed;
+        private float _courseDegrees;
+        private Vector3 _previousReported;
+        private bool _hasPreviousReported;
 
         public GeoCoordinate coordinate { get => _coordinate; }
         public GnssSolution solution { get => _solution; }
         public RtkQualityModel model { get => _model; }
+        /// <summary>The sky the last solution was computed from. Empty without a sky sensor.</summary>
+        public GnssSkyView sky { get => _sky; }
+        /// <summary>[m/s] ground speed, derived from successive fixes as a receiver does.</summary>
+        public float groundSpeed { get => _groundSpeed; }
+        /// <summary>[deg] course over ground, clockwise from North.</summary>
+        public float courseDegrees { get => _courseDegrees; }
 
         /// <summary>
         /// Configure sensor at runtime (avoids Reflection overhead)
@@ -123,6 +134,7 @@ namespace UnitySensors.Sensor.GNSS
                 _solution.state = RtkState.Fix;
                 _solution.horizontalSigma = _model.fix.reportedSigma;
                 _coordinate = ToCoordinate(position, 0.0, 0.0);
+                UpdateMotion(position, 0.0, 0.0, Mathf.Max(1e-3f, this.dt));
                 yield return null;
                 yield break;
             }
@@ -132,6 +144,7 @@ namespace UnitySensors.Sensor.GNSS
             _lastMeasured = now;
 
             GnssSkyView sky = skyView.skyView;
+            _sky = sky;
             SatelliteObservation[] satellites = sky.satellites;
 
             _lineOfSight.Clear();
@@ -151,7 +164,36 @@ namespace UnitySensors.Sensor.GNSS
                 _carrierLock.LockedFor(_model.lockSecondsForFix));
 
             _coordinate = ToCoordinate(position, _solution.errorEast, _solution.errorNorth);
+            UpdateMotion(position, _solution.errorEast, _solution.errorNorth, dt);
             yield return null;
+        }
+
+        /// <summary>
+        /// Ground speed and course, derived from successive REPORTED positions.
+        /// </summary>
+        /// <remarks>
+        /// From the reported ones, not the truth: a receiver has no other source,
+        /// and deriving them from the truth would quietly hand a consumer a velocity
+        /// cleaner than the position it came with.
+        /// </remarks>
+        private void UpdateMotion(Vector3 worldPosition, double errorEast, double errorNorth, float dt)
+        {
+            Vector3 local = _coordinateSystem.ToLocal(worldPosition);
+            var reported = new Vector3((float)(local.z + errorEast), (float)(-local.x + errorNorth), local.y);
+            if (_hasPreviousReported && dt > 0.0f)
+            {
+                float dEast = reported.x - _previousReported.x;
+                float dNorth = reported.y - _previousReported.y;
+                float distance = Mathf.Sqrt(dEast * dEast + dNorth * dNorth);
+                _groundSpeed = distance / dt;
+                if (distance > 1e-4f)
+                {
+                    // NMEA course is degrees clockwise from North.
+                    _courseDegrees = Mathf.Repeat(Mathf.Atan2(dEast, dNorth) * Mathf.Rad2Deg, 360.0f);
+                }
+            }
+            _previousReported = reported;
+            _hasPreviousReported = true;
         }
 
         /// <summary>
