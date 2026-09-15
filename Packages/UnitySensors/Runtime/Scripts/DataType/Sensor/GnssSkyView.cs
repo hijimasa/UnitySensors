@@ -31,6 +31,16 @@ namespace UnitySensors.DataType.Sensor
         public float excessPathLength;
         /// <summary>[dB] relative to a clean direct signal, so always &lt;= 0.</summary>
         public float relativePowerDb;
+        /// <summary>
+        /// World position the signal bounced off, when the path is
+        /// <see cref="SatelliteVisibility.Nlos"/>. Meaningless otherwise.
+        /// </summary>
+        /// <remarks>
+        /// Kept so the path can be drawn. A picture of the actual route a signal
+        /// took -- out to a wall and back -- explains an NLOS error in a way no
+        /// number does, which matters when the error is the point of the scene.
+        /// </remarks>
+        public UnityEngine.Vector3 reflectionPoint;
     }
 
     /// <summary>

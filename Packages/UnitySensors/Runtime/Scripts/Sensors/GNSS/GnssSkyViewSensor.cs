@@ -265,6 +265,7 @@ namespace UnitySensors.Sensor.GNSS
                 _working[i].visibility = hit ? SatelliteVisibility.Blocked : SatelliteVisibility.LineOfSight;
                 _working[i].excessPathLength = 0.0f;
                 _working[i].relativePowerDb = 0.0f;
+                _working[i].reflectionPoint = Vector3.zero;
                 if (hit)
                 {
                     blocked++;
@@ -421,6 +422,7 @@ namespace UnitySensors.Sensor.GNSS
                     // polarisation flip that the antenna then rejects. Tune it against
                     // measured C/N0 rather than trusting the default.
                     _working[s].relativePowerDb = _reflectionLossDb;
+                    _working[s].reflectionPoint = _candidatePoint[slot];
                 }
             }
         }
